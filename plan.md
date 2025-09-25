@@ -46,8 +46,8 @@ An opinionated, Docker-based CI/CD template generator that creates GitHub Action
 - **Hotfixes**: Creating a release from hotfix tags `v*-hotfix.*` → deploy directly to production
 
 Workflow:
-1. Create and push git tag: `git tag v1.2.3 && git push origin v1.2.3` → **deploys to staging**
-2. Test staging deployment, then create GitHub release → **deploys to production**
+1. Create and push git tag: `git tag v1.2.3 && git push origin v1.2.3` → **builds image and deploys to staging**
+2. Test staging deployment, then create GitHub release → **deploys same image to production**
 3. Rollback = create new release from previous tag
 
 ### CI/CD Flow
@@ -90,21 +90,11 @@ Workflow:
 ```
 1. Trigger (GitHub release creation)
    ↓
-2. Lint & Code Quality Checks
+2. Pre-deploy Hooks
    ↓
-3. Test Execution
+3. Deploy to Production
    ↓
-4. Pre-build Hooks
-   ↓
-5. Docker Build & Optimization
-   ↓
-6. Post-build Hooks (security scanning)
-   ↓
-7. Pre-deploy Hooks
-   ↓
-8. Deploy to Production
-   ↓
-9. Post-deploy Hooks
+4. Post-deploy Hooks
 ```
 
 ## Template Generation
@@ -360,7 +350,7 @@ jobs:
         if: env.EMERGENCY_MODE != 'true'
         run: npm test
 
-      # Docker build and deploy directly to production (skip staging)
+      # Build new image and deploy directly to production (skip staging)
       - name: Build and Deploy
         run: |
           # Generated deployment logic here
